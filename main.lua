@@ -19,6 +19,7 @@ local paddlePosP1
 local paddlePosP2
 
 local paddlesCanMove
+local ballCanMove
 
 local ballPosX
 local ballPosY
@@ -27,6 +28,7 @@ local ballDirectionY
 
 local ballTimer = 0
 local paddleTimer = 0
+local ballDelayTimer = 0
 
 function initGrid()
     --[[
@@ -91,6 +93,9 @@ function resetBall()
 
     grid[yMid][xMid] = BALL
 
+    -- wait before putting the ball in play again
+    ballCanMove = false
+
     -- allow paddles to move now
     paddlesCanMove = true
 end
@@ -148,6 +153,14 @@ function love.update(dt)
 
     ballTimer = ballTimer + dt
     paddleTimer = paddleTimer + dt
+
+    if not ballCanMove then
+        ballDelayTimer = ballDelayTimer + dt
+        if ballDelayTimer >= BALL_RESET_WAIT then
+            ballCanMove = true
+            ballDelayTimer = 0
+        end
+    end
 
     if paddleTimer >= PADDLE_TICK and paddlesCanMove then
         paddleTimer = 0
@@ -212,11 +225,11 @@ function love.update(dt)
         end
     end
 
-    if ballTimer >= BALL_TICK then
+    if ballCanMove and ballTimer >= BALL_TICK then
 
         ballTimer = 0
+
         -- update ball position
-        -- TODO change so that ball passes through last columns
         local newBallPosX = ballPosX + ballDirectionX
         local newBallPosY = ballPosY + ballDirectionY
 

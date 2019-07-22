@@ -22,8 +22,8 @@ UP = -1
 DOWN = 1
 NONE = 0
 
--- time delta between two game states
+-- time deltas between movements
 BALL_TICK = 0.045
 PADDLE_TICK = 0.05
 
--- TODO choose font
+BALL_RESET_WAIT = 0.8
