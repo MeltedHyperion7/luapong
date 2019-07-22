@@ -23,7 +23,7 @@ DOWN = 1
 NONE = 0
 
 -- time delta between two game states
-BALL_TICK = 0.04
+BALL_TICK = 0.045
 PADDLE_TICK = 0.05
 
 -- TODO choose font

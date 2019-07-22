@@ -18,6 +18,8 @@ local directionP2 = NONE
 local paddlePosP1
 local paddlePosP2
 
+local paddlesCanMove
+
 local ballPosX
 local ballPosY
 local ballDirectionX
@@ -88,6 +90,9 @@ function resetBall()
     ballDirectionY = dirY
 
     grid[yMid][xMid] = BALL
+
+    -- allow paddles to move now
+    paddlesCanMove = true
 end
 
 function drawGrid()
@@ -144,7 +149,7 @@ function love.update(dt)
     ballTimer = ballTimer + dt
     paddleTimer = paddleTimer + dt
 
-    if paddleTimer >= PADDLE_TICK then
+    if paddleTimer >= PADDLE_TICK and paddlesCanMove then
         paddleTimer = 0
 
         if love.keyboard.isDown(P1_KEY_UP) then
@@ -212,28 +217,25 @@ function love.update(dt)
         ballTimer = 0
         -- update ball position
         -- TODO change so that ball passes through last columns
-        -- TODO add sound on hitting paddle
         local newBallPosX = ballPosX + ballDirectionX
         local newBallPosY = ballPosY + ballDirectionY
 
-        if newBallPosX == 1 then
-            if grid[newBallPosY][newBallPosX] == PADDLE then
-                ballDirectionX = ballDirectionX * -1
-                hitSound:play()
-            else
-                scoreP2 = scoreP2 + 1
-                explosionSound:play()
-                resetBall()
-            end
-        elseif newBallPosX == MAX_TILES_X then
-            if grid[newBallPosY][newBallPosX] == PADDLE then
-                ballDirectionX = ballDirectionX * -1
-                hitSound:play()
-            else
-                scoreP1 = scoreP1 + 1
-                explosionSound:play()
-                resetBall()
-            end
+        if newBallPosX == 1 and grid[newBallPosY][newBallPosX] == PADDLE then
+            ballDirectionX = ballDirectionX * -1
+            hitSound:play()
+        elseif newBallPosX == 0 then
+            paddlesCanMove = false
+            scoreP2 = scoreP2 + 1
+            explosionSound:play()
+            resetBall()
+        elseif newBallPosX == MAX_TILES_X and grid[newBallPosY][newBallPosX] == PADDLE then
+            ballDirectionX = ballDirectionX * -1
+            hitSound:play()
+        elseif newBallPosX == MAX_TILES_X + 1 then
+            paddlesCanMove = false
+            scoreP1 = scoreP1 + 1
+            explosionSound:play()
+            resetBall()
         elseif newBallPosY == 1 or newBallPosY == MAX_TILES_Y then
             ballDirectionY = ballDirectionY * -1
             grid[ballPosY][ballPosX] = EMPTY
